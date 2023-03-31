@@ -370,7 +370,10 @@ const formattedMov5 = new Intl.NumberFormat(acc.locale, {
  
 // 5 IMPLEMENTING LOG IN
 
+
+// WE NEED THIS TWO VARIABLES TO PERSIST ON MORE THAN ONE FUNCTION (THATS WHY WE PUT IN IN THE GLOBAL VARIABLE)
 let currentAccount;
+let timer;
 
 btnLogin.addEventListener('click', function (e) {
   
@@ -396,6 +399,14 @@ if (currentAccount?.pin === Number(inputLoginPin.value) ){
   inputLoginUsername.value = '';
   inputLoginPin.value = ''; 
   // inputLoginUsername.blur();
+
+  // DISPLAY TIMEOUT
+
+  // IF TIMER EXISTS IN THE CURRENT ACCOUNT LOG IN, CLEAR THE RUNNING TIMEOUT.....
+if (timer) clearInterval(timer);
+
+// ...AND SET TIMEOUT TO THE SETTIMEOUT FUNCTION TO READ AGAIN FROM THE START TIME
+ timer = setTimeout();
 
 
 
@@ -499,6 +510,9 @@ if (amount > 0
     currentAccount.movementsDates.push(new Date().toISOString());
     receiverAccout.movementsDates.push(new Date().toISOString());
 
+    // SET TIMER BACK TO NORMAL, BY CLEARING IT FIRST AND CALLING IT BACK
+    clearInterval(timer);
+    timer = setTimeout();
   }
 inputTransferTo.value = '';
 inputTransferAmount.value = '';
@@ -536,13 +550,14 @@ if (amount > 0 && currentAccount.movements.some(mov=> mov >= amount * 0.1)){
    updateUI(currentAccount);
 }, 5000 );    
 
+// SET TIMER BACK TO NORMAL, BY CLEARING IT FIRST AND CALLING IT BACK
+clearInterval(timer);
+timer = setTimeout();
+
 }
 
 
 })
-
-
-
 
 
 
@@ -568,6 +583,39 @@ const index = accounts.findIndex (acc => acc.username === currentAccount.usernam
 
 })
 
+
+// 9  SET TIMEOUT WHEN A USER LOGS IN
+const setTimeout = function () {
+// SET TIME TO 100s
+
+let time = 30;
+
+// INTERVAL WAS GIVEN A NAME OF (CONST TIMER) SO THAT WE WILL BE ABLE TO CLEAR THE INTERVAL (STOP TIMER AND LOG OUT WHEN THE TIME IS UP)
+const timer = setInterval (function () {
+  // TO GET MINUTES
+  const min = String(Math.trunc(time / 60)).padStart(2, 0);
+
+  // REMAINDER OF TIME / 60 TO GET SECONDS.
+  const sec = String(Math.trunc(time % 60)).padStart(2, 0);
+
+  // IN EACH CALL PRINT THE REMAINING TIME TO THE UI
+  labelTimer.textContent = `${min} : ${sec}`;
+
+  // WHEN 0 SECONDS, STOP TIMER AND LOG OUT---COMES BEFORE (TIME--)
+  if (time === 0) {
+    clearInterval(timer);
+    labelWelcome.textContent = 'Log In To Get Started';
+    containerApp.style.opacity = 0;
+  }
+
+  // DECREASE TIME BY SECONDS
+  time--;
+
+
+}, 1000)
+// WE RETURNED THE TIMER SO THAT WE CAN USE THE CLEARINTERVAL TO CLEAR THE TIMER IF ITS RUNING IN EACH ACCOUNT LOGGED IN
+  return timer;
+}
 
 
 
