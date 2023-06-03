@@ -114,6 +114,8 @@ const containerApp = document.querySelector('.app');
 
 const containerMovements = document.querySelector('.movements');
 
+const login = document.querySelector('.login')
+
 const btnLogin = document.querySelector('.login__btn');
 
 const btnTransfer = document.querySelector('.form__btn--transfer');
@@ -137,6 +139,53 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 
 const inputClosePin = document.querySelector('.form__input--pin');
+
+
+///MODAL
+const modal = document.querySelector('.modal');
+
+const overlay = document.querySelector('.overlay');
+
+const btnCloseModal = document.querySelector('.btn--close-modal');
+
+const btnsOpenModal = document.querySelectorAll('.btn--show-modal');
+
+const modalText = document.querySelector('.modal__header')
+
+
+
+
+
+const openModal = function (msg) {
+  modal.classList.remove('hidden');
+  overlay.classList.remove('hidden');
+  // console.log(`${msg}`);
+  modalText.textContent = `${msg}`
+};
+
+const closeModal = function () {
+  modal.classList.add('hidden');
+  overlay.classList.add('hidden');
+};
+
+for (let i = 0; i < btnsOpenModal.length; i++)
+  btnsOpenModal[i].addEventListener('click', openModal);
+
+btnCloseModal.addEventListener('click', closeModal);
+overlay.addEventListener('click', closeModal);
+
+
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+    closeModal();
+  }
+});
+
+
+
+
+
+
 
 
 
@@ -398,6 +447,7 @@ if (currentAccount?.pin === Number(inputLoginPin.value) ){
 
   inputLoginUsername.value = '';
   inputLoginPin.value = ''; 
+  login.style.display = 'none';
   // inputLoginUsername.blur();
 
   // DISPLAY TIMEOUT
@@ -453,6 +503,14 @@ labelDate.textContent = new Intl.DateTimeFormat(currentAccount.locale, options).
 
   updateUI(currentAccount);
     
+}  
+
+else if (!currentAccount?.pin !== Number(inputLoginPin.value)){
+  // labelWelcome.textContent = "wrong input";
+  openModal('WRONG INPUT');
+
+  //  DISPLAY UI
+  // containerApp.style.opacity = 0;
 }
 }) 
 
@@ -513,6 +571,11 @@ if (amount > 0
     // SET TIMER BACK TO NORMAL, BY CLEARING IT FIRST AND CALLING IT BACK
     clearInterval(timer);
     timer = setTimeout();
+
+  }if (!receiverAccout) {
+        openModal('WRONG USERNAME');
+  } if (amount > currentAccount.balance){
+    openModal('INSUFFICIENT BALANCE')
   }
 inputTransferTo.value = '';
 inputTransferAmount.value = '';
@@ -553,7 +616,8 @@ if (amount > 0 && currentAccount.movements.some(mov=> mov >= amount * 0.1)){
 // SET TIMER BACK TO NORMAL, BY CLEARING IT FIRST AND CALLING IT BACK
 clearInterval(timer);
 timer = setTimeout();
-
+} else{
+  openModal('YOU ARE NOT ELIGIBLE FOR THIS LOAN');
 }
 
 
@@ -584,11 +648,15 @@ const index = accounts.findIndex (acc => acc.username === currentAccount.usernam
 })
 
 
+
+
+
+
 // 9  SET TIMEOUT WHEN A USER LOGS IN
 const setTimeout = function () {
 // SET TIME TO 100s
 
-let time = 30;
+let time = 170;
 
 // INTERVAL WAS GIVEN A NAME OF (CONST TIMER) SO THAT WE WILL BE ABLE TO CLEAR THE INTERVAL (STOP TIMER AND LOG OUT WHEN THE TIME IS UP)
 const timer = setInterval (function () {
@@ -606,6 +674,8 @@ const timer = setInterval (function () {
     clearInterval(timer);
     labelWelcome.textContent = 'Log In To Get Started';
     containerApp.style.opacity = 0;
+    modal.classList.add('hidden')
+    overlay.classList.add('hidden')
   }
 
   // DECREASE TIME BY SECONDS
